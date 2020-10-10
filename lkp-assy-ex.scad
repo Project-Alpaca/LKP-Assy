@@ -18,6 +18,8 @@ LED_BACKING_THICKNESS = 2;
 TOP_EXT_WIDTH = 8;
 // Width of the bottom extension.
 BOTTOM_EXT_WIDTH = 8;
+// Width of the bottom adhesive (must be <= BOTTOM_EXT_WIDTH. Recommended to be < BOTTOM_EXT_WIDTH for best Alpaca integration).
+BOTTOM_EXT_ADH_WIDTH = 6.5;
 // Width of the side extension.
 SIDE_EXT_WIDTH = 4;
 // Length of heat set inserts.
@@ -38,6 +40,10 @@ LKP_PCB_WIDTH = 40.5;
 LKP_PCB_TOTAL_LENGTH = 516;
 // Thickness of the LKP PCB.
 LKP_PCB_THICKNESS = 1.6;
+// Offset of the mounting hole.
+LKP_SIDE_TAB_MOUNTING_HOLE_OFFSET = 4;
+// Width of the side tab.
+LKP_SIDE_TAB_WIDTH = 8;
 // Width of the overlay portion that is covered by the overlay clamp.
 OVERLAY_EXT_WIDTH = 3;
 // Thickness of the acrylic/PC overlay.
@@ -71,7 +77,7 @@ _BASE_THICKNESS = BASE_MIN_THICKNESS
 _LKP_ORIGIN = [BOTTOM_EXT_WIDTH, _BASE_THICKNESS - _LKP_CUTOUT_DEPTH];
 
 // Width of the overlay
-_OVERLAY_WIDTH = BOTTOM_EXT_WIDTH + LKP_PCB_WIDTH + OVERLAY_EXT_WIDTH;
+_OVERLAY_WIDTH = BOTTOM_EXT_ADH_WIDTH + LKP_PCB_WIDTH + OVERLAY_EXT_WIDTH;
 _OVERLAY_CUTOUT = [
     _OVERLAY_WIDTH + EPSILON*2,
     OVERLAY_THICKNESS + EPSILON
@@ -113,6 +119,22 @@ _BLOCK_SCREW_HOLE_OFFSET = 30;
 
 _HSI_HOLE_DEPTH = HSI_LENGTH * 1.5;
 
+
+// Sensor center offsets
+_SENSOR_ASSY_COFFSET = [0, _BASE_WIDTH / 2 - (BOTTOM_EXT_WIDTH+LKP_PCB_WIDTH/2)];
+_SENSOR_OVERLAY_COFFSET = [0, _OVERLAY_WIDTH / 2 - (BOTTOM_EXT_ADH_WIDTH+LKP_PCB_WIDTH/2)];
+
+
+// Exports
+LKP_EXPORT_ASSY_LENGTH = LKP_PCB_TOTAL_LENGTH+SIDE_EXT_WIDTH*2;
+LKP_EXPORT_BASE_WIDTH = _BASE_WIDTH;
+LKP_EXPORT_OVERLAY_WIDTH = _OVERLAY_WIDTH;
+
+LKP_EXPORT_ASSY_DIM = [LKP_EXPORT_ASSY_LENGTH, _BASE_WIDTH];
+LKP_EXPORT_OVERLAY_DIM = [LKP_PCB_TOTAL_LENGTH, _OVERLAY_WIDTH];
+LKP_EXPORT_ASSY_ZOFFSET = - _BASE_THICKNESS + OVERLAY_THICKNESS;
+
+
 function _bottom_screw_hole(off) = [
     BOTTOM_EXT_WIDTH / 2,
     // Bottom extension thickness
@@ -152,6 +174,18 @@ function _led_cover_screw_hole(off) = [
     off
 ];
 
+module lkp_assy_profile() {
+    square(LKP_EXPORT_ASSY_DIM, center=true);
+}
+
+module lkp_assy_sensor_center() {
+    translate(_SENSOR_ASSY_COFFSET) children();
+}
+
+module lkp_overlay_sensor_center() {
+    translate(_SENSOR_OVERLAY_COFFSET) children();
+}
+
 module iso7380_m3(length, headless=false) {
     dk = 5.5;
     d = 3.2;
@@ -187,7 +221,7 @@ module base_ex(side_ext=false) {
                         // PCB
                         square(_LKP_CUTOUT);
                         // Overlay (above PCB)
-                        translate([-EPSILON-_LKP_ORIGIN.x, LKP_PCB_THICKNESS])
+                        translate([-EPSILON-BOTTOM_EXT_ADH_WIDTH, LKP_PCB_THICKNESS])
                         square(_OVERLAY_CUTOUT);
                     }
                 }
@@ -249,7 +283,6 @@ module lkp_connector_cutout_ex() {
     translate([-15.625, 0]) square([12, 24], center=true);
     translate([15.625, 0]) square([12, 24], center=true);
 }
-
 
 module base_bare() {
     // To lay flat horizontally, use
@@ -324,7 +357,7 @@ module base_l() {
             translate([0, 0, -SIDE_EXT_WIDTH]) side_ext_base();
         }
         // Screw holes for LKP PCB
-        lkp_hsi(4);
+        lkp_hsi(LKP_SIDE_TAB_MOUNTING_HOLE_OFFSET);
     }
 }
 
@@ -336,7 +369,7 @@ module base_r() {
             translate([0, 0, _LKP_CUTOUT_LENGTH_PER_BLOCK - EPSILON]) side_ext_base();
         }
         // Screw holes for LKP PCB
-        lkp_hsi(_LKP_CUTOUT_LENGTH_PER_BLOCK - 4);
+        lkp_hsi(_LKP_CUTOUT_LENGTH_PER_BLOCK - LKP_SIDE_TAB_MOUNTING_HOLE_OFFSET);
     }
 }
 
@@ -399,6 +432,30 @@ module demo_assy() {
     }
 }
 
+// Demo assembly. Centered at sensor center.
+module lkp_demo_assy_centered() {
+    translate([-LKP_PCB_TOTAL_LENGTH/2, -BOTTOM_EXT_WIDTH-LKP_PCB_WIDTH/2, 0]) demo_assy();
+}
+
+module lkp_overlay_profile() {
+    difference() {
+        square(LKP_EXPORT_OVERLAY_DIM, center=true);
+        // Left screw holes
+        translate([-LKP_PCB_TOTAL_LENGTH/2 + LKP_SIDE_TAB_MOUNTING_HOLE_OFFSET, 0])
+                translate(-_SENSOR_OVERLAY_COFFSET) {
+            translate([0, -15, 0]) circle(d=3.2);
+            translate([0, 15, 0]) circle(d=3.2);
+        }
+
+        // Right screw holes
+        translate([LKP_PCB_TOTAL_LENGTH/2 - LKP_SIDE_TAB_MOUNTING_HOLE_OFFSET, 0])
+                translate(-_SENSOR_OVERLAY_COFFSET) {
+            translate([0, -15, 0]) circle(d=3.2);
+            translate([0, 15, 0]) circle(d=3.2);
+        }
+    }
+}
+
 // Print dimension info
 echo("*** Begin Dimension Info ***");
 echo("Extrusion Profile")
@@ -412,7 +469,7 @@ echo(
     screw_hole_depth_bottom=_SCREW_HOLE_DEPTH_BOTTOM,
     screw_hole_depth_top=_SCREW_HOLE_DEPTH_TOP
 );
-echo(assy_length=LKP_PCB_TOTAL_LENGTH+SIDE_EXT_WIDTH*2)
+echo(assy_length=LKP_EXPORT_ASSY_LENGTH);
 echo("*** End Dimension Info ***");
 
 
