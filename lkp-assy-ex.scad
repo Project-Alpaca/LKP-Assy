@@ -119,6 +119,8 @@ _BLOCK_SCREW_HOLE_OFFSET = 30;
 
 _HSI_HOLE_DEPTH = HSI_LENGTH * 1.5;
 
+// Total length of assembly
+_ASSY_LENGTH = LKP_PCB_TOTAL_LENGTH+SIDE_EXT_WIDTH*2;
 
 // Sensor center offsets
 _SENSOR_ASSY_COFFSET = [0, _BASE_WIDTH / 2 - (BOTTOM_EXT_WIDTH+LKP_PCB_WIDTH/2)];
@@ -126,13 +128,13 @@ _SENSOR_OVERLAY_COFFSET = [0, _OVERLAY_WIDTH / 2 - (BOTTOM_EXT_ADH_WIDTH+LKP_PCB
 
 
 // Exports
-LKP_EXPORT_ASSY_LENGTH = LKP_PCB_TOTAL_LENGTH+SIDE_EXT_WIDTH*2;
-LKP_EXPORT_BASE_WIDTH = _BASE_WIDTH;
-LKP_EXPORT_OVERLAY_WIDTH = _OVERLAY_WIDTH;
-
-LKP_EXPORT_ASSY_DIM = [LKP_EXPORT_ASSY_LENGTH, _BASE_WIDTH];
+LKP_EXPORT_ASSY_DIM = [_ASSY_LENGTH, _BASE_WIDTH];
 LKP_EXPORT_OVERLAY_DIM = [LKP_PCB_TOTAL_LENGTH, _OVERLAY_WIDTH];
 LKP_EXPORT_ASSY_ZOFFSET = - _BASE_THICKNESS + OVERLAY_THICKNESS;
+
+function lkp_get_assy_dim() = LKP_EXPORT_ASSY_DIM;
+function lkp_get_overlay_dim() = LKP_EXPORT_ASSY_DIM;
+function lkp_get_assy_zoffset() = LKP_EXPORT_ASSY_ZOFFSET;
 
 
 function _bottom_screw_hole(off) = [
@@ -456,6 +458,10 @@ module lkp_overlay_profile() {
     }
 }
 
+module lkp_assy_zposition() {
+    translate([0, 0, LKP_EXPORT_ASSY_ZOFFSET]) children();
+}
+
 // Print dimension info
 echo("*** Begin Dimension Info ***");
 echo("Extrusion Profile")
@@ -469,7 +475,7 @@ echo(
     screw_hole_depth_bottom=_SCREW_HOLE_DEPTH_BOTTOM,
     screw_hole_depth_top=_SCREW_HOLE_DEPTH_TOP
 );
-echo(assy_length=LKP_EXPORT_ASSY_LENGTH);
+echo(assy_length=_ASSY_LENGTH);
 echo("*** End Dimension Info ***");
 
 
