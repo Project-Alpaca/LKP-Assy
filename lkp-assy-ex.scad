@@ -91,7 +91,13 @@ _LED_GROOVE_ORIGIN = [
     _BASE_THICKNESS - _LED_GROOVE_PADDING
 ];
 
+_LED_CABLE_HOLE_ORIGIN = [_LED_GROOVE_ORIGIN.x, 0];
+
 _LED_KEEPOUT = [LED_STRIP_THICKNESS, LED_STRIP_WIDTH];
+_LED_KEEPOUT_CABLE_HOLE = [
+    LED_STRIP_THICKNESS,
+    LED_STRIP_WIDTH+(_LED_GROOVE_ORIGIN.y-_LED_CABLE_HOLE_ORIGIN.y)
+];
 
 _LED_BACKING_ORIGIN = [
     _LED_GROOVE_ORIGIN.x + LED_STRIP_THICKNESS,
@@ -226,8 +232,13 @@ module base_ex(side_ext=false) {
                     }
                 }
             }
-            // LED groove
-            translate(_LED_GROOVE_ORIGIN) square(_LED_KEEPOUT);
+            if (side_ext) {
+                translate(_LED_CABLE_HOLE_ORIGIN)
+                    square(_LED_KEEPOUT_CABLE_HOLE);
+            } else {
+                // LED groove
+                translate(_LED_GROOVE_ORIGIN) square(_LED_KEEPOUT);
+            }
         }
         // Additions
         // LED backing
