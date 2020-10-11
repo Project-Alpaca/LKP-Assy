@@ -10,8 +10,6 @@ PREVIEW="2d_assy"; // ["2d_assy", "2d_led_cover", "2d_base", "2d_lkp_conn_cutout
 /* [General Parameters] */
 // Minimum thickness of the base.
 BASE_MIN_THICKNESS = 2;
-// Diameter of the screw hole. A little bit tolerance is recommended.
-SCREW_HOLE_DIA = 3.2;
 // Thickness of the extended LED strip backing structure.
 LED_BACKING_THICKNESS = 2;
 // Width of the top extension.
@@ -189,8 +187,8 @@ module lkp_overlay_sensor_center() {
 }
 
 module iso7380_m3(length, headless=false) {
-    dk = 5.5;
-    d = 3.2;
+    dk = 6.0;
+    d = 3.0 + 0.4;
     head_depth = 2;
     if (!headless) {
         translate([0, 0, -head_depth]) {
@@ -445,15 +443,15 @@ module lkp_overlay_profile() {
         // Left screw holes
         translate([-LKP_PCB_TOTAL_LENGTH/2 + LKP_SIDE_TAB_MOUNTING_HOLE_OFFSET, 0])
                 translate(-_SENSOR_OVERLAY_COFFSET) {
-            translate([0, -15, 0]) circle(d=3.2);
-            translate([0, 15, 0]) circle(d=3.2);
+            translate([0, -15, 0]) circle(d=3.4);
+            translate([0, 15, 0]) circle(d=3.4);
         }
 
         // Right screw holes
         translate([LKP_PCB_TOTAL_LENGTH/2 - LKP_SIDE_TAB_MOUNTING_HOLE_OFFSET, 0])
                 translate(-_SENSOR_OVERLAY_COFFSET) {
-            translate([0, -15, 0]) circle(d=3.2);
-            translate([0, 15, 0]) circle(d=3.2);
+            translate([0, -15, 0]) circle(d=3.4);
+            translate([0, 15, 0]) circle(d=3.4);
         }
     }
 }
