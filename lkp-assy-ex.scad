@@ -20,8 +20,23 @@ BOTTOM_EXT_WIDTH = 8;
 BOTTOM_EXT_ADH_WIDTH = 6.5;
 // Width of the side extension.
 SIDE_EXT_WIDTH = 4;
-// Length of heat set inserts.
-HSI_LENGTH = 3;
+
+/* [Heat set inserts (HSI) parameters] */
+
+// Diameter of the hole. Should be slightly smaller than the outer diameter of HSI.
+HSI_D_MIN = 4.0;
+
+// Depth of the hole or total length of the HSI.
+HSI_DEPTH = 3.6;
+
+// Hole depth multiplier for compensating oozing material during insertion. 1.5 should be good for most of the cases.
+HSI_DEPTH_MULTIPLIER = 1.5;
+
+// Diameter of the taper (set this and HSI_DEPTH_TAPER to -1 to disable taper)
+HSI_D_TAPER = 4.5;
+
+// Depth of the taper (set this and HSI_D_TAPER to-1 to disable taper)
+HSI_DEPTH_TAPER = 1.0;
 
 /* [LED Strip Parameters] */
 // Width of the LED strip.
@@ -68,9 +83,16 @@ _LED_GROOVE_PADDING = _LED_LOWER_WIDTH + OVERLAY_THICKNESS / 2;
 // How deep should the PCB cut-out be
 _LKP_CUTOUT_DEPTH = LKP_PCB_THICKNESS + OVERLAY_THICKNESS;
 
-// Minimum thickness + LED groove depth or PCB cut-out depth, whichever deeper.
+_HSI_HOLE_DEPTH = HSI_DEPTH * HSI_DEPTH_MULTIPLIER;
+
+// Minimum thickness + LED groove depth or PCB cut-out depth or HSI hole depth + thickness of overlay and PCB, whichever deeper.
 _BASE_THICKNESS = BASE_MIN_THICKNESS
-                + max(_LED_GROOVE_PADDING, _LKP_CUTOUT_DEPTH);
+                  + max(_LED_GROOVE_PADDING,
+                        _LKP_CUTOUT_DEPTH,
+                        _HSI_HOLE_DEPTH+OVERLAY_THICKNESS+LKP_PCB_THICKNESS);
+
+echo(_LED_GROOVE_PADDING);
+echo(_LKP_CUTOUT_DEPTH);
 
 _LKP_ORIGIN = [BOTTOM_EXT_WIDTH, _BASE_THICKNESS - _LKP_CUTOUT_DEPTH];
 
@@ -120,8 +142,6 @@ _SCREW_HOLE_DEPTH_TOP_COVER = _BASE_THICKNESS;
 
 _BLOCK_SCREW_HOLE_OFFSET = 30;
 //_LED_COVER_SCREW_HOLE_OFFSET = 45;
-
-_HSI_HOLE_DEPTH = HSI_LENGTH * 1.5;
 
 // Total length of assembly
 _ASSY_LENGTH = LKP_PCB_TOTAL_LENGTH+SIDE_EXT_WIDTH*2;
@@ -210,8 +230,8 @@ module iso7380_m3(length, headless=false) {
     }
 }
 
-module hsi_m3x3_od4mm() {
-    hsi(3.6, _HSI_HOLE_DEPTH + EPSILON, d_taper=4.2, depth_taper=0.8);
+module hsi_wrapper() {
+    hsi(HSI_D_MIN, _HSI_HOLE_DEPTH + EPSILON, d_taper=HSI_D_TAPER, depth_taper=HSI_DEPTH_TAPER);
 }
 
 module base_ex(side_ext=false) {
@@ -323,8 +343,8 @@ module side_ext_led_cover() {
 
 module lkp_hsi(off) {
     translate([_LKP_ORIGIN.x + (LKP_PCB_WIDTH / 2), _LKP_ORIGIN.y+EPSILON, off]) {
-        translate([15, 0, 0]) rotate([-90, 0, 0]) hsi_m3x3_od4mm();
-        translate([-15, 0, 0]) rotate([-90, 0, 0]) hsi_m3x3_od4mm();
+        translate([15, 0, 0]) rotate([-90, 0, 0]) hsi_wrapper();
+        translate([-15, 0, 0]) rotate([-90, 0, 0]) hsi_wrapper();
     }
 }
 
@@ -336,15 +356,15 @@ module base() {
     difference() {
         base_bare();
         translate(_bottom_hsi(loff)) rotate([90, 0, 0])
-        hsi_m3x3_od4mm();
+        hsi_wrapper();
         translate(_bottom_hsi(roff)) rotate([90, 0, 0])
-        hsi_m3x3_od4mm();
+        hsi_wrapper();
         translate(_top_hsi(coff)) rotate([90, 0, 0])
-        hsi_m3x3_od4mm();
+        hsi_wrapper();
         translate(_top_hsi_led_cover(loff)) rotate([-90, 0, 0])
-        hsi_m3x3_od4mm();
+        hsi_wrapper();
         translate(_top_hsi_led_cover(roff)) rotate([-90, 0, 0])
-        hsi_m3x3_od4mm();
+        hsi_wrapper();
     }
 }
 
