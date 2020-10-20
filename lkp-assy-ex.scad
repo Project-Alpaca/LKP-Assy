@@ -125,7 +125,10 @@ _LED_BACKING_ORIGIN = [
 
 _LED_BACKING = [LED_BACKING_THICKNESS, LED_STRIP_WIDTH];
 
-_LED_BACKING_EXT_HEIGHT = LED_STRIP_WIDTH + BASE_MIN_THICKNESS - _BASE_THICKNESS;
+// base thickness - LED strip lower width (which is located at the center of overlay) - half of overlay thickness
+_LED_GROOVE_TO_BASE_BOTTOM = _BASE_THICKNESS - _LED_LOWER_WIDTH - OVERLAY_THICKNESS/2;
+
+_LED_BACKING_EXT_HEIGHT = LED_STRIP_WIDTH + _LED_GROOVE_TO_BASE_BOTTOM - _BASE_THICKNESS;
 
 _LED_COVER_THICKNESS = OVERLAY_EXT_WIDTH + _LED_BACKING_EXT_HEIGHT;
 
@@ -525,7 +528,7 @@ if ($preview && PREVIEW != "build") {
         linear_extrude(10) {
             base_ex();
         }
-        translate([0, 10]) linear_extrude(10) {
+        translate([-TOP_EXT_WIDTH-5, 0]) linear_extrude(10) {
             led_cover_ex();
         }
     } else if (TARGET == "demo_assy") {
