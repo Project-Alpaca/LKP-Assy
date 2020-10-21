@@ -24,7 +24,7 @@ SIDE_EXT_WIDTH = 4;
 /* [Heat set inserts (HSI) parameters] */
 
 // Diameter of the hole. Should be slightly smaller than the outer diameter of HSI.
-HSI_D_MIN = 4.0;
+HSI_D_MIN = 3.8;
 
 // Depth of the hole or total length of the HSI.
 HSI_DEPTH = 3.6;
@@ -33,7 +33,7 @@ HSI_DEPTH = 3.6;
 HSI_DEPTH_MULTIPLIER = 1.5;
 
 // Diameter of the taper (set this and HSI_DEPTH_TAPER to -1 to disable taper)
-HSI_D_TAPER = 4.5;
+HSI_D_TAPER = 4.3;
 
 // Depth of the taper (set this and HSI_D_TAPER to-1 to disable taper)
 HSI_DEPTH_TAPER = 1.0;
