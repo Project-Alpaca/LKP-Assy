@@ -5,7 +5,7 @@ use <hsi.scad>
 // Build target
 TARGET="nothing"; // ["nothing", "dummy", "demo_assy", "blocks"]
 // Preview target
-PREVIEW="2d_assy"; // ["2d_assy", "2d_led_cover", "2d_base", "2d_lkp_conn_cutout", "build"]
+PREVIEW="2d_assy"; // ["2d_assy", "2d_led_cover", "2d_base", "2d_lkp_conn_cutout", "2d_drill_assy", "2d_drill", "build"]
 
 /* [General Parameters] */
 // Minimum thickness of the base.
@@ -184,10 +184,18 @@ function _bottom_hsi(off) = [
     -EPSILON,
     off
 ];
+function _bottom_hsi_2d(off) = [
+    off,
+    BOTTOM_EXT_WIDTH / 2
+];
 function _top_hsi(off) = [
     _LED_BACKING_ORIGIN.x + LED_BACKING_THICKNESS + TOP_EXT_WIDTH / 2,
     -EPSILON,
     off
+];
+function _top_hsi_2d(off) = [
+    off,
+    _LED_BACKING_ORIGIN.x + LED_BACKING_THICKNESS + TOP_EXT_WIDTH / 2
 ];
 function _top_hsi_led_cover(off) = [
     _LED_BACKING_ORIGIN.x + LED_BACKING_THICKNESS + TOP_EXT_WIDTH / 2,
@@ -368,6 +376,15 @@ module base() {
     }
 }
 
+module base_drill_profile() {
+    loff = _BLOCK_SCREW_HOLE_OFFSET;
+    roff = _LKP_CUTOUT_LENGTH_PER_BLOCK - _BLOCK_SCREW_HOLE_OFFSET;
+    coff = _LKP_CUTOUT_LENGTH_PER_BLOCK / 2;
+    translate(_bottom_hsi_2d(loff)) circle(d=3.2);
+    translate(_bottom_hsi_2d(roff)) circle(d=3.2);
+    translate(_top_hsi_2d(coff)) circle(d=3.2);
+}
+
 module led_cover() {
     loff = _BLOCK_SCREW_HOLE_OFFSET;
     roff = _LKP_CUTOUT_LENGTH_PER_BLOCK - _BLOCK_SCREW_HOLE_OFFSET;
@@ -463,9 +480,27 @@ module demo_assy() {
     }
 }
 
+module assy_drill_profile() {
+    for (i=[0:2]) {
+        translate([_LKP_CUTOUT_LENGTH_PER_BLOCK*i, 0, 0]) base_drill_profile();
+    }
+}
+
+module assy_centered() {
+    translate([-LKP_PCB_TOTAL_LENGTH/2, -BOTTOM_EXT_WIDTH-LKP_PCB_WIDTH/2, 0])
+        children();
+}
+module lkp_assy_cut_profile_centered() {
+    square([55, 50], center=true);
+}
+
+module lkp_assy_drill_profile_centered() {
+    assy_centered() assy_drill_profile();
+}
+
 // Demo assembly. Centered at sensor center.
 module lkp_demo_assy_centered() {
-    translate([-LKP_PCB_TOTAL_LENGTH/2, -BOTTOM_EXT_WIDTH-LKP_PCB_WIDTH/2, 0]) demo_assy();
+    assy_centered() demo_assy();
 }
 
 module lkp_overlay_profile() {
@@ -521,6 +556,10 @@ if ($preview && PREVIEW != "build") {
         base_ex();
     } else if (PREVIEW == "2d_lkp_conn_cutout") {
         lkp_connector_cutout_ex();
+    } else if (PREVIEW == "2d_drill_assy") {
+        lkp_assy_drill_profile_centered();
+    } else if (PREVIEW == "2d_drill") {
+        base_drill_profile();
     }
 } else {
     $fn=40;
