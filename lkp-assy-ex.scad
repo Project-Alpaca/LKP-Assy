@@ -481,7 +481,7 @@ module demo_assy() {
 }
 
 module assy_drill_profile() {
-    %square(LKP_EXPORT_ASSY_DIM);
+    translate([-SIDE_EXT_WIDTH, 0]) %square(LKP_EXPORT_ASSY_DIM);
     for (i=[0:2]) {
         translate([_LKP_CUTOUT_LENGTH_PER_BLOCK*i, 0, 0]) base_drill_profile();
     }
@@ -505,12 +505,14 @@ module lkp_demo_assy_centered() {
 }
 
 module assy_cable_hole_cut_profile() {
-    rotate([0, 0, 90]) %base_ex();
-    %square(LKP_EXPORT_ASSY_DIM);
-    translate([-SIDE_EXT_WIDTH, _LED_GROOVE_ORIGIN.x])
-        square([SIDE_EXT_WIDTH*2, _LED_KEEPOUT_CABLE_HOLE.x]);
-    translate([LKP_PCB_TOTAL_LENGTH+SIDE_EXT_WIDTH, _LED_GROOVE_ORIGIN.x])
-        square([2*SIDE_EXT_WIDTH, _LED_KEEPOUT_CABLE_HOLE.x]);
+    translate([-SIDE_EXT_WIDTH, 0]) {
+        rotate([0, 0, 90]) %base_ex();
+        %square(LKP_EXPORT_ASSY_DIM);
+        translate([-SIDE_EXT_WIDTH, _LED_GROOVE_ORIGIN.x])
+            square([SIDE_EXT_WIDTH*2, _LED_KEEPOUT_CABLE_HOLE.x]);
+        translate([LKP_PCB_TOTAL_LENGTH+SIDE_EXT_WIDTH, _LED_GROOVE_ORIGIN.x])
+            square([2*SIDE_EXT_WIDTH, _LED_KEEPOUT_CABLE_HOLE.x]);
+    }
 }
 
 module lkp_assy_cable_hole_cut_profile_centered() {
