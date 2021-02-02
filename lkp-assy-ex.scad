@@ -5,7 +5,7 @@ use <hsi.scad>
 // Build target
 TARGET="nothing"; // ["nothing", "dummy", "demo_assy", "blocks"]
 // Preview target
-PREVIEW="2d_assy"; // ["2d_assy", "2d_led_cover", "2d_base", "2d_lkp_conn_cutout", "2d_drill_assy", "2d_drill", "build"]
+PREVIEW="2d_assy"; // ["2d_assy", "2d_led_cover", "2d_base", "2d_lkp_conn_cutout", "2d_drill_assy", "2d_drill", "2d_cable_hole", "build"]
 
 /* [General Parameters] */
 // Minimum thickness of the base.
@@ -481,6 +481,7 @@ module demo_assy() {
 }
 
 module assy_drill_profile() {
+    %square(LKP_EXPORT_ASSY_DIM);
     for (i=[0:2]) {
         translate([_LKP_CUTOUT_LENGTH_PER_BLOCK*i, 0, 0]) base_drill_profile();
     }
@@ -501,6 +502,19 @@ module lkp_assy_drill_profile_centered() {
 // Demo assembly. Centered at sensor center.
 module lkp_demo_assy_centered() {
     assy_centered() demo_assy();
+}
+
+module assy_cable_hole_cut_profile() {
+    rotate([0, 0, 90]) %base_ex();
+    %square(LKP_EXPORT_ASSY_DIM);
+    translate([-SIDE_EXT_WIDTH, _LED_GROOVE_ORIGIN.x])
+        square([SIDE_EXT_WIDTH*2, _LED_KEEPOUT_CABLE_HOLE.x]);
+    translate([LKP_PCB_TOTAL_LENGTH+SIDE_EXT_WIDTH, _LED_GROOVE_ORIGIN.x])
+        square([2*SIDE_EXT_WIDTH, _LED_KEEPOUT_CABLE_HOLE.x]);
+}
+
+module lkp_assy_cable_hole_cut_profile_centered() {
+    assy_centered() assy_cable_hole_cut_profile();
 }
 
 module lkp_overlay_profile() {
@@ -560,6 +574,8 @@ if ($preview && PREVIEW != "build") {
         lkp_assy_drill_profile_centered();
     } else if (PREVIEW == "2d_drill") {
         base_drill_profile();
+    } else if (PREVIEW == "2d_cable_hole") {
+        lkp_assy_cable_hole_cut_profile_centered();
     }
 } else {
     $fn=40;
