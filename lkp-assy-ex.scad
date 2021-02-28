@@ -3,7 +3,7 @@ use <hsi.scad>
 
 /* [Build Options] */
 // Build target
-TARGET="nothing"; // ["nothing", "dummy", "demo_assy", "blocks"]
+TARGET="nothing"; // ["nothing", "dummy", "demo_assy", "blocks", "2d_overlay_profile", "2d_assy_drill_profile"]
 // Preview target
 PREVIEW="2d_assy"; // ["2d_assy", "2d_led_cover", "2d_base", "2d_lkp_conn_cutout", "2d_drill_assy", "2d_drill", "2d_cable_hole", "build"]
 
@@ -604,5 +604,9 @@ if ($preview && PREVIEW != "build") {
         demo_assy();
     } else if (TARGET == "blocks") {
         top_blocks();
+    } else if (TARGET == "2d_overlay_profile") {
+        lkp_overlay_profile();
+    } else if (TARGET == "2d_assy_drill_profile") {
+        assy_centered() assy_drill_profile();
     }
 }
