@@ -140,6 +140,9 @@ _SCREW_HOLE_DEPTH_TOP = _BASE_THICKNESS + _LED_COVER_THICKNESS - 2;
 _SCREW_HOLE_DEPTH_TOP_BASE = _BASE_THICKNESS;
 _SCREW_HOLE_DEPTH_TOP_COVER = _BASE_THICKNESS;
 
+_SCREW_LENGTH_COVER = _LED_COVER_THICKNESS - 2 + HSI_DEPTH;
+_SCREW_LENGTH_OVERLAY = LKP_PCB_THICKNESS + OVERLAY_THICKNESS + HSI_DEPTH;
+
 _BLOCK_SCREW_HOLE_OFFSET = 30;
 //_LED_COVER_SCREW_HOLE_OFFSET = 45;
 
@@ -544,19 +547,28 @@ module lkp_assy_zposition() {
 
 // Print dimension info
 echo("*** Begin Dimension Info ***");
-echo("Extrusion Profile")
+echo("Extrusion Profile");
 echo(led_groove_padding=_LED_GROOVE_PADDING, lkp_cutout_depth=_LKP_CUTOUT_DEPTH);
 echo(base_width=_BASE_WIDTH, base_thickness=_BASE_THICKNESS);
 echo(overlay_width=_OVERLAY_WIDTH);
 echo(led_cover_thickness=_LED_COVER_THICKNESS);
 
-echo("3D Block Profile")
+echo("3D Block Profile");
 echo(
     screw_hole_depth_bottom=_SCREW_HOLE_DEPTH_BOTTOM,
     screw_hole_depth_top=_SCREW_HOLE_DEPTH_TOP
 );
 echo(assy_length=_ASSY_LENGTH);
+
+echo("Screw Lengths");
+echo(
+    cover=_SCREW_LENGTH_COVER,
+    overlay=_SCREW_LENGTH_OVERLAY,
+    bottom_without_backing=HSI_DEPTH
+);
 echo("*** End Dimension Info ***");
+
+
 
 
 // TODO parameters for generating dummies
