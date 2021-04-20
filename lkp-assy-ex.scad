@@ -49,8 +49,8 @@ LED_STRIP_OFFSET = 0.0;
 /* [Slider Parameters] */
 // Width of the LKP PCB (40+-tolerance).
 LKP_PCB_WIDTH = 40.5;
-// Length of the LKP PCB.
-LKP_PCB_TOTAL_LENGTH = 516;
+// Length of the LKP PCB (516+-tolerance).
+LKP_PCB_TOTAL_LENGTH = 516.5;
 // Thickness of the LKP PCB.
 LKP_PCB_THICKNESS = 1.6;
 // Offset of the mounting hole.
